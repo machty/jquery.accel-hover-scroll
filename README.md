@@ -29,6 +29,10 @@ might actually serve you better, so be sure to A/B test.
 
 http://jsfiddle.net/machty/qsbBc/
 
+There's also a questionably-informative
+[blog post](http://machty.github.com/blog/2012/11/12/jquery-accelerated-hover-scroll/)
+about the plugin that you can read.
+
 ## Options
 
 This plugin supports a variety of options to customize scroller.
