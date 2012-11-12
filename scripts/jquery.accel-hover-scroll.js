@@ -61,8 +61,8 @@
         overflow: 'hidden'
       });
       this.currentScrollSpeed = 0;
-      this.$leftArrow = $('.arrow-left');
-      this.$rightArrow = $('.arrow-right');
+      this.$leftArrow = $('.hoverscroll-left');
+      this.$rightArrow = $('.hoverscroll-right');
       this.$leftArrow.hide();
       this.$outerContainer.hover(this._onMouseEnter, this._onMouseLeave);
       return;

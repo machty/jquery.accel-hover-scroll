@@ -45,8 +45,8 @@ class $.AccelHoverScroll
 
     @currentScrollSpeed = 0
 
-    @$leftArrow = $('.arrow-left')
-    @$rightArrow = $('.arrow-right')
+    @$leftArrow = $('.hoverscroll-left')
+    @$rightArrow = $('.hoverscroll-right')
 
     # We start off scrolled all the way to the left, so left arrow should be invisible.
     @$leftArrow.hide()

@@ -6,10 +6,10 @@ output 'scripts'
 input 'lib' do
   match "*.coffee" do
     filter Rake::Pipeline::Web::Filters::CoffeeScriptFilter
-    copy ["jquery.accel-hover-scroll.js", "jquery.accel-hover-scroll.min.js", "ohshit.js"]
+    copy ["jquery.accel-hover-scroll.js", "jquery.accel-hover-scroll.min.js"]
   end
 
-  match "jquery.accel-hover-scroll.js" do
+  match "jquery.accel-hover-scroll.min.js" do
     filter Rake::Pipeline::Web::Filters::UglifyFilter
   end
 end
