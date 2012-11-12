@@ -1,0 +1,5 @@
+bin/
+.bundle
+tmp/
+.DS_Store
+.project

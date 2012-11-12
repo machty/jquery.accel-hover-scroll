@@ -1,0 +1,16 @@
+require "rake-pipeline-web-filters"
+require "uglifier"
+
+output 'scripts'
+
+input 'lib' do
+  match "*.coffee" do
+    filter Rake::Pipeline::Web::Filters::CoffeeScriptFilter
+    copy ["jquery.accel-hover-scroll.js", "jquery.accel-hover-scroll.min.js", "ohshit.js"]
+  end
+
+  match "jquery.accel-hover-scroll.js" do
+    filter Rake::Pipeline::Web::Filters::UglifyFilter
+  end
+end
+
