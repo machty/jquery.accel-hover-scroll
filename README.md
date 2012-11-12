@@ -9,10 +9,21 @@ in that direction. The closer you are to the edge, the faster it
 scrolls. This is by no means a new UI interaction, but I couldn't find a
 suitable plugin for my needs, so I built this one.
 
+Please let me know if there's a more concise way to describe this
+interaction. `jquery.accel-hover-scroll` doesn't exactly roll off the
+tongue.
+
 ### What kind of containers does it support?
 
 This plugin supports all the typical means of horizontally lining up
 content, including floating, inline-block + white-space nowrap, etc.
+
+### CSS3?
+
+The code's built to use `jQuery.fn.animate`, and plays nicely with 
+`jquery.animate-enhanced`, though depending on what you're actually
+displaying and a million other factors, the timer-based animate 
+might actually serve you better, so be sure to A/B test.
 
 ## Demo
 
