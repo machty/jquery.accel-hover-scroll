@@ -87,7 +87,7 @@ The hover-scroll functionality can be temporarily disabled via the
 
 ### Credits / Contribution
 
-Built by Alex Matchneer on behalf of the [Useful Robot](usefulrobot.io)
+Built by Alex Matchneer on behalf of the [Useful Robot](http://www.usefulrobot.io)
 
 Feel free to contribute to this plugin via the normal pull request
 fanfare.
