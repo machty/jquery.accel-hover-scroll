@@ -71,6 +71,10 @@ class $.AccelHoverScroll
   resume: ->
     @isPaused = false
 
+  scrollZero: ->
+    @_reset()
+    @$contentContainer.css('left', "0px")
+
   _onMouseEnter: (e) =>
     return if @isPaused
 

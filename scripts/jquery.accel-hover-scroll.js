@@ -86,6 +86,11 @@
       return this.isPaused = false;
     };
 
+    AccelHoverScroll.prototype.scrollZero = function() {
+      this._reset();
+      return this.$contentContainer.css('left', "0px");
+    };
+
     AccelHoverScroll.prototype._onMouseEnter = function(e) {
       var gutterWidth;
       if (this.isPaused) {
