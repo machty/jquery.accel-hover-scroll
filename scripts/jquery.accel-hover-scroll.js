@@ -36,11 +36,16 @@
       this._onResize = __bind(this._onResize, this);
 
       this.$outerContainer = $(element);
+      this.dimen = {};
       this.options = {
         maxScrollSpeed: 800,
         scrollGutterPercentage: 0.3,
         scrollGutterSlices: 5,
-        overrideCursor: true
+        overrideCursor: true,
+	direction:'horizontal',
+	includeOffset: false,//If scroll is used inside a iframe the cursor position should subtract from offset top
+	includeScroll: null,//If scroll item is placed absolute
+	adjustOffsetvalue: 0,//If scroll is used inside a Fixed Postiion Element
       };
       $.extend(this.options, options);
       this.defaultCursor = this.$outerContainer.css('cursor');
@@ -55,15 +60,41 @@
       }
       this.$contentContainer.css({
         position: position,
-        left: "0px"
       });
+
+      if(this.options.direction == 'horizontal') {
+	  this.dimen['length']  = 'width';
+	  this.dimen['start']  = 'left';	
+	  this.dimen['end']  = 'right';
+	  this.dimen['outer']  = 'outerWidth';
+	  this.dimen['cursor']  = 'clientX';	
+	  this.dimen['cursor-s'] = 'w-resize';
+	  this.dimen['cursor-e'] = 'e-resize';
+       } else {
+	  this.dimen['length']  = 'height';
+	  this.dimen['start']  = 'top';	
+	  this.dimen['end']  = 'bottom';	
+	  this.dimen['outer']  = 'outerHeight';
+	  this.dimen['cursor']  = 'clientY';
+	  this.dimen['cursor-s'] = 'n-resize';
+	  this.dimen['cursor-e'] = 's-resize';
+       }
+      this.$contentContainer.css(this.dimen['start'],"0px");
       this.$outerContainer.css({
         overflow: 'hidden'
       });
+
+      this.$contentContainer.orginalHeight =     this.$contentContainer[this.dimen['outer']](true);
+      this.$outerContainer.orginalHeight =     this.$outerContainer[this.dimen['length']]();
+      if(this.options.adjustOffsetvalue) {
+	this.offsetLength = this.options.adjustOffsetvalue;
+      } else {
+      	this.offsetLength = this.$outerContainer.offset().top;
+      }
       this.currentScrollSpeed = 0;
-      this.$leftArrow = $('.hoverscroll-left');
-      this.$rightArrow = $('.hoverscroll-right');
-      this.$leftArrow.hide();
+      this.$backArrow = $('.hoverscroll-'+this.dimen['start']);
+      this.$frontArrow = $('.hoverscroll-'+this.dimen['end']);
+      this.$backArrow.hide();
       this.$outerContainer.hover(this._onMouseEnter, this._onMouseLeave);
       return;
       if ($.event.special.smartresize) {
@@ -72,7 +103,7 @@
         $(window).resize(this._onResize);
       }
     }
-
+   
     AccelHoverScroll.prototype._onResize = function() {
       return console.log("Resizeed!");
     };
@@ -88,19 +119,19 @@
 
     AccelHoverScroll.prototype.scrollZero = function() {
       this._reset();
-      return this.$contentContainer.css('left', "0px");
+      return this.$contentContainer.css(this.dimen['start'], "0px");
     };
 
     AccelHoverScroll.prototype._onMouseEnter = function(e) {
-      var gutterWidth;
+      var gutterLength;
       if (this.isPaused) {
         return;
       }
       this.currentScrollSpeed = 0;
-      this.contentContainerWidth = this.$contentContainer.outerWidth(true);
-      this.outerWidth = this.$outerContainer.outerWidth(true);
-      gutterWidth = this.outerWidth * this.options.scrollGutterPercentage;
-      this.currentSliceSize = Math.ceil(gutterWidth / this.options.scrollGutterSlices);
+      this.contentContainerLength = this.$contentContainer[this.dimen['outer']](true);
+      this.outerLength = this.$outerContainer[this.dimen['length']]();
+      gutterLength = this.outerLength * this.options.scrollGutterPercentage;
+      this.currentSliceSize = Math.ceil(gutterLength / this.options.scrollGutterSlices);
       return this.$outerContainer.mousemove(this._onMouseMove);
     };
 
@@ -124,20 +155,32 @@
     };
 
     AccelHoverScroll.prototype._onMouseMove = function(e) {
-      var accelPerc, contentContainerLeft, distanceToGo, duration, gutterPerc, left, maxScroll, perc, s, sliceIndex, sliceSize, targetScrollSpeed,
+      var accelPerc, contentContainerStart, distanceToGo, duration, gutterPerc, back, maxScroll, perc, s, sliceIndex, sliceSize, targetScrollSpeed,
         _this = this;
       if (this.isPaused) {
         return;
       }
       gutterPerc = this.options.scrollGutterPercentage;
-      perc = e.clientX / this.outerWidth;
+      var offsetLength = this.offsetLength;
+      if(this.options.includeScroll){
+	var offset= this.$outerContainer.offset();
+	offsetLength = offset[this.dimen['start']] - $(window).scrollTop();
+
+      }
+      if(this.options.includeOffset) {
+	perc =( e[this.dimen['cursor']] - offsetLength) / this.outerLength;	
+
+      } else {
+      	perc = e[this.dimen['cursor']] / this.outerLength;
+      }
       targetScrollSpeed = 0;
       if (perc < gutterPerc) {
-        left = true;
+        back = true;
+	console.log('asd');
         accelPerc = 1 - (perc / gutterPerc);
         targetScrollSpeed = accelPerc * this.options.maxScrollSpeed;
       } else if (perc > (1 - gutterPerc)) {
-        left = false;
+        back = false;
         accelPerc = (perc - 1 + gutterPerc) / gutterPerc;
         targetScrollSpeed = accelPerc * this.options.maxScrollSpeed;
       } else {
@@ -152,16 +195,16 @@
       this.oldSliceIndex = sliceIndex;
       targetScrollSpeed = Math.floor(targetScrollSpeed / 10) * 10;
       targetScrollSpeed = Math.max(10, targetScrollSpeed);
-      if (left) {
+      if (back) {
         targetScrollSpeed = -targetScrollSpeed;
       }
       if (targetScrollSpeed === this.currentScrollSpeed) {
         return;
       }
       this.currentScrollSpeed = targetScrollSpeed;
-      contentContainerLeft = parseInt(this.$contentContainer.css('left'));
-      maxScroll = this.contentContainerWidth - this.outerWidth;
-      distanceToGo = left ? Math.abs(contentContainerLeft) : maxScroll + contentContainerLeft;
+      contentContainerStart = parseInt(this.$contentContainer.css(this.dimen['start']));
+      maxScroll = this.contentContainerLength - this.outerLength;
+      distanceToGo = back ? Math.abs(contentContainerStart) : maxScroll + contentContainerStart;
       if (distanceToGo < 0) {
         this._reset(true);
         return;
@@ -171,23 +214,23 @@
       if (!duration) {
         return;
       }
-      this.$leftArrow.fadeIn();
-      this.$rightArrow.fadeIn();
+      this.$backArrow.fadeIn();
+      this.$frontArrow.fadeIn();
       if (this.options.overrideCursor) {
-        if (left) {
-          this.$outerContainer.css('cursor', 'w-resize');
+        if (back) {
+          this.$outerContainer.css('cursor',  this.dimen['cursor-s']);
         } else {
-          this.$outerContainer.css('cursor', 'e-resize');
+          this.$outerContainer.css('cursor',  this.dimen['cursor-e']);
         }
       }
-      s = left ? "0px" : "-" + (Math.abs(maxScroll)) + "px";
-      return this.$contentContainer.stop(true, false).animate({
-        left: s
-      }, duration, 'linear', function() {
-        if (left) {
-          _this.$leftArrow.fadeOut();
+      s = back ? "0px" : "-" + (Math.abs(maxScroll)) + "px";
+      var opt  = {};
+      opt[this.dimen['start']]	= s;
+      return this.$contentContainer.stop(true, false).animate(opt, duration, 'linear', function() {
+        if (back) {
+          _this.$backArrow.fadeOut();
         } else {
-          _this.$rightArrow.fadeOut();
+          _this.$frontArrow.fadeOut();
         }
         return _this._reset();
       });
