@@ -43,7 +43,7 @@
         scrollGutterSlices: 5,
         overrideCursor: true,
 	direction:'horizontal',
-	includeOffset: 'false',//If scroll is used inside a iframe the cursor position should subtract from offset top
+	includeOffset: false,//If scroll is used inside a iframe the cursor position should subtract from offset top
       };
       $.extend(this.options, options);
       this.defaultCursor = this.$outerContainer.css('cursor');
