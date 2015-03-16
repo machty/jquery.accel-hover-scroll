@@ -44,6 +44,8 @@
         overrideCursor: true,
 	direction:'horizontal',
 	includeOffset: false,//If scroll is used inside a iframe the cursor position should subtract from offset top
+	includeScroll: null,//If scroll item is placed absolute
+	adjustOffsetvalue: 0,//If scroll is used inside a Fixed Postiion Element
       };
       $.extend(this.options, options);
       this.defaultCursor = this.$outerContainer.css('cursor');
@@ -84,7 +86,11 @@
 
       this.$contentContainer.orginalHeight =     this.$contentContainer[this.dimen['outer']](true);
       this.$outerContainer.orginalHeight =     this.$outerContainer[this.dimen['length']]();
-      this.offsetLength = this.$outerContainer.offset().top;
+      if(this.options.adjustOffsetvalue) {
+	this.offsetLength = this.options.adjustOffsetvalue;
+      } else {
+      	this.offsetLength = this.$outerContainer.offset().top;
+      }
       this.currentScrollSpeed = 0;
       this.$backArrow = $('.hoverscroll-'+this.dimen['start']);
       this.$frontArrow = $('.hoverscroll-'+this.dimen['end']);
@@ -155,8 +161,15 @@
         return;
       }
       gutterPerc = this.options.scrollGutterPercentage;
+      var offsetLength = this.offsetLength;
+      if(this.options.includeScroll){
+	var offset= this.$outerContainer.offset();
+	offsetLength = offset[this.dimen['start']] - $(window).scrollTop();
+
+      }
       if(this.options.includeOffset) {
-	perc =( e[this.dimen['cursor']] - this.offsetLength) / this.outerLength;	
+	perc =( e[this.dimen['cursor']] - offsetLength) / this.outerLength;	
+
       } else {
       	perc = e[this.dimen['cursor']] / this.outerLength;
       }
